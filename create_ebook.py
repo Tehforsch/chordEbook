@@ -20,16 +20,23 @@ def getTitle(content):
             title = line.replace("#+TITLE: ", "").replace(" tab", "")
             return title
 
+def isTab(content):
+    return sum(1 for line in content if "-" in line) / len(content) > 0.5
+
 def createEbook(inputFiles):
     contents = [readlines(f) for f in inputFiles]
     contents.sort(key=lambda content: getTitle(content))
+    for content in contents:
+        if isTab(content):
+            print(getTitle(content))
+    contents = [content for content in contents if not isTab(content)]
     lines = [line for content in contents for line in content]
     lines = [replaceTitle(line) for line in lines]
     lines = [l for l in lines if not "[[" in l]
     with open(outFile, "w") as f:
         result = "".join(lines)
         f.write(result)
-    os.system(f"ebook-convert {outFile} out.epub --markdown-extensions=nl2br ")
+    os.system(f"ebook-convert {outFile} out.epub --markdown-extensions=nl2br --no-default-epub-cover")
     os.unlink(outFile)
 
 def findTabNotes():
