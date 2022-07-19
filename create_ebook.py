@@ -7,7 +7,7 @@ outFile = "out.md"
 def replaceTitle(line):
     if "TITLE" in line:
         title = line.replace("#+TITLE: ", "").replace(" tab", "")
-        return f"<h1>{title}</h1>"
+        return f"<h1 class=\"chapter\">{title}</h1>"
     return line
 
 def readlines(filename):
@@ -26,9 +26,6 @@ def isTab(content):
 def createEbook(inputFiles):
     contents = [readlines(f) for f in inputFiles]
     contents.sort(key=lambda content: getTitle(content))
-    for content in contents:
-        if isTab(content):
-            print(getTitle(content))
     contents = [content for content in contents if not isTab(content)]
     lines = [line for content in contents for line in content]
     lines = [replaceTitle(line) for line in lines]
@@ -36,7 +33,7 @@ def createEbook(inputFiles):
     with open(outFile, "w") as f:
         result = "".join(lines)
         f.write(result)
-    os.system(f"ebook-convert {outFile} out.epub --markdown-extensions=nl2br --no-default-epub-cover")
+    os.system(f"ebook-convert {outFile} out.epub --markdown-extensions=nl2br --no-default-epub-cover --title chords --authors tehforsch")
     os.unlink(outFile)
 
 def findTabNotes():
